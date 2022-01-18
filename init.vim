@@ -4,7 +4,6 @@ set relativenumber
 set tabstop=4 softtabstop=4
 set shiftwidth=4
 set expandtab
-set smartindent
 set encoding=utf8
 set exrc
 set nohlsearch
@@ -18,19 +17,12 @@ set undodir=~/.vim/undodir
 set undofile
 set incsearch
 setl commentstring=//%s
+set smartindent
 " set g:airline_powerline_fonts = 1
+set list
+" set listchars=tab:>\trail:--
 
 call plug#begin("~/.vim/plugged")
-" Plug 'junegunn/fzf', {'do': { -> fzf#install() } }
-" Plug 'junegunn/fzf.vim'
-Plug 'pangloss/vim-javascript'
-Plug 'peitalin/vim-jsx-typescript'
-Plug 'leafgarland/typescript-vim'
-Plug 'dracula/vim'
-Plug 'scrooloose/nerdtree'
-Plug 'ryanoasis/vim-devicons'
-
-Plug 'vimlab/split-term.vim'
 Plug 'tpope/vim-capslock'
 Plug 'easymotion/vim-easymotion'
 Plug 'mhinz/vim-signify'
@@ -39,6 +31,26 @@ Plug 'tpope/vim-rhubarb'
 Plug 'junegunn/gv.vim'
 Plug 'Tpope/vim-commentary'
 Plug 'gruvbox-community/gruvbox'
+if exists('g:vscode')
+    " VSCode extension
+
+else
+    " ordinary neovim
+" Plug 'junegunn/fzf', {'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'leafgarland/typescript-vim'
+Plug 'dracula/vim'
+Plug 'scrooloose/nerdtree'
+Plug 'ryanoasis/vim-devicons'
+" Added for closing Brakets
+Plug 'Raimondi/delimitMate'
+Plug 'vim-scripts/cpp_doxygen'
+" geht nicht
+" let g:load_doxygen_syntax=1
+" nnoremap <leader>d <Plug>cpp_doxygenInsert
+Plug 'vimlab/split-term.vim'
 " Neovim Tree shitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
@@ -78,7 +90,11 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'dbeniamine/cheat.sh-vim'
 Plug 'Chiel92/vim-autoformat'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+" Plug 'gbprod/substitute.nvim'
+Plug 'svermeulen/vim-subversive'
+
 call plug#end()
+
 
 " lua <<EOF
 "   -- Setup nvim-cmp.
@@ -219,10 +235,12 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 nnoremap <silent> <C-a> :NERDTreeToggle<CR>
  
 set splitright  
+
 set splitbelow  
 " turn terminal to normal mode with escape
 tnoremap <Esc> <C-\><C-n>
-" " start terminal in insert mode
+tnoremap <C-k> <C-\><C-n>
+nnoremap n nzzzv" " start terminal in insert mode
 au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 " " open terminal on ctrl+n
 function! OpenTerminal()
@@ -278,11 +296,13 @@ nnoremap <leader>sc :e $MYVIMRC<CR>
 
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
-nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
+nnoremap n nzzzvnnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <C-p> :lua require('telescope.builtin').git_files()<CR>
-nnoremap <Leader>pf :lua require('telescope.builtin').find_files()<CR>
+nnoremap n nzzzvnnoremap <Leader>pf :lua require('telescope.builtin').find_files()<CR>
 
 
 " https://github.com/ThePrimeagen/.dotfiles/blob/ca41b9e81a131cc0ac414d26d6703b5c21fd143a/nvim/.config/nvim/plugin/telescope.vim
@@ -319,6 +339,8 @@ nnoremap <C-j> <C-d>
 nnoremap <C-k> <C-u>
 vnoremap <C-j> <C-d>
 vnoremap <C-k> <C-u>
+"tnoremap <C-j> <C-d>
+"tnoremap <C-k> <ESC>
 "
 " Change Comment String for Cpp
 autocmd FileType c,cpp,java setl commentstring=//\ %s
@@ -334,7 +356,8 @@ noremap <leader>vb :VisualBlock<CR>
 " Open New Line and close it 
 nnoremap <leader>o o<ESC>
 nnoremap <leader>O O<ESC>
-
+" make CR act like in insert mode
+nnoremap <CR> i<CR><ESC>
 
 " inoremap <S-DEL> <BACKSPACE>
 "
@@ -370,3 +393,27 @@ nnoremap <leader>7 :lua require("harpoon.ui").nav_file(7)<CR>
 nnoremap <leader>8 :lua require("harpoon.ui").nav_file(8)<CR>
 nnoremap <leader>fa :lua require("harpoon.mark").add_file()<CR>
 nnoremap <leader>fr :lua require("harpoon.ui").toggle_quick_menu()<CR>
+
+nnoremap <leader>r :!mv platformio.ini platformio2.ini<CR> :!mv platformio3.ini platformio.ini<CR> :!mv platformio2.ini platformio3.ini<CR><CR>
+
+nnoremap Y y$
+
+nnoremap n nzzzv
+nnoremap N Nzzzv
+nnoremap J mzJ'z
+
+augroup highlight_yank
+    autocmd!
+    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank({timeout = 40})
+augroup END
+
+
+" Subsitute Plugin
+" s for substitute
+nmap s <plug>(SubversiveSubstitute)
+nmap ss <plug>(SubversiveSubstituteLine)
+nmap S <plug>(SubversiveSubstituteToEndOfLine)
+nmap <leader>s <plug>(SubversiveSubstituteRange)
+xmap <leader>s <plug>(SubversiveSubstituteRange)
+nmap <leader>ss <plug>(SubversiveSubstituteWordRange)
+endif
